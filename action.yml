@@ -29,5 +29,7 @@ runs:
     - name: Run LLM version check
       id: check
       shell: bash
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: |
         python3 ${{ github.action_path }}/check_llm.py "${{ inputs.source }}"
