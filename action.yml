@@ -10,9 +10,6 @@ inputs:
     description: "LLM provider to check (currently supports: openai)"
     required: true
     default: "openai"
-  api_key:
-    description: "API key for the LLM provider (use secrets.OPENAI_API_KEY)"
-    required: false
 
 outputs:
   model_detected:
@@ -32,5 +29,7 @@ runs:
     - name: Run LLM version check
       id: check
       shell: bash
+      env:
+        OPENAI_API_KEY: ${{ env.OPENAI_API_KEY }}
       run: |
         python3 ${{ github.action_path }}/check_llm.py "${{ inputs.source }}"

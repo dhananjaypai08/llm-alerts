@@ -1,6 +1,9 @@
 import sys, requests, os
 from dotenv import load_dotenv
-load_dotenv()
+
+# Only load .env file if it exists (for local development)
+if os.path.exists('.env'):
+    load_dotenv()
 
 def check_openai():
     # You can only query `models` list (and they don’t publish changelogs).
