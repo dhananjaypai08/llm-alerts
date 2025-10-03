@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check for new LLM models
-        uses: dhananjaypai/llm-version-alert@v1
+        uses: dhananjaypai08/llm-alert@v1
         with:
           source: "openai"
         env:
