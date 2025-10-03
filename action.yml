@@ -1,5 +1,5 @@
 name: "LLM Version Alert"
-description: "🚨 Automatically checks for new LLM model releases and sends alerts. Supports OpenAI GPT models with plans for Claude, Gemini, and more."
+description: "Checks for new LLM model releases and sends alerts for OpenAI GPT models."
 author: "dhananjaypai"
 branding:
   icon: "bell"
