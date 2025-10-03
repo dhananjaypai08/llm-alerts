@@ -6,6 +6,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - uses: ./action.yml
+      - name: Run LLM Version Check
+        uses: ./
         with:
           source: "openai"
