@@ -1,10 +1,24 @@
-name: "LLM Version Checker"
-description: "Checks for new LLM releases and alerts automatically"
+name: "LLM Version Alert"
+description: "🚨 Automatically checks for new LLM model releases and sends alerts. Supports OpenAI GPT models with plans for Claude, Gemini, and more."
+author: "dhananjaypai"
+branding:
+  icon: "bell"
+  color: "blue"
+
 inputs:
   source:
-    description: "Source provider (e.g., openai)"
+    description: "LLM provider to check (currently supports: openai)"
     required: true
     default: "openai"
+  api_key:
+    description: "API key for the LLM provider (use secrets.OPENAI_API_KEY)"
+    required: false
+
+outputs:
+  model_detected:
+    description: "The latest model detected"
+  version_changed:
+    description: "Whether a new version was detected (true/false)"
 
 runs:
   using: "composite"
@@ -13,11 +27,10 @@ runs:
       shell: bash
       run: |
         python3 --version
-        pip install requests
-        pip install python-dotenv
+        pip install requests python-dotenv
 
-    - name: Run version check
+    - name: Run LLM version check
       id: check
       shell: bash
       run: |
-        python3 $GITHUB_ACTION_PATH/check_llm.py "${{ inputs.source }}"
+        python3 ${{ github.action_path }}/check_llm.py "${{ inputs.source }}"
