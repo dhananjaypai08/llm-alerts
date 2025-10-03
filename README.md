@@ -129,4 +129,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 🐛 Issues
 
-Found a bug or have a feature request? [Open an issue](https://github.com/dhananjaypai/llm-version-alert/issues)!
+Found a bug or have a feature request? [Open an issue](https://github.com/dhananjaypai08/llm-alerts/issues)!
