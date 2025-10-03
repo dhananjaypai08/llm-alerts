@@ -2,15 +2,13 @@
 
 Automatically detect new LLM model releases and get notified in your GitHub workflows. Never miss a new GPT, Claude, or other language model release!
 
-## 🔥 Features
+## Features
 
-- ✅ **OpenAI GPT Models**: Automatically detects latest GPT-4 models
-- 🔔 **Smart Notifications**: Only alerts when new models are actually released
-- 🏃 **Zero Setup**: Works out of the box with minimal configuration
-- 📦 **Stateful**: Remembers previous versions to avoid duplicate alerts
-- 🛡️ **Secure**: Uses GitHub secrets for API keys
+- **OpenAI GPT Models and others soon**: Automatically detects latest GPT-4 models
+- **Zero Setup**: Works out of the box with minimal configuration
+- **Stateful**: Remembers previous versions to avoid duplicate alerts
 
-## 🚀 Quick Start
+## Quick Start
 
 ```yaml
 name: LLM Version Monitor
@@ -27,11 +25,10 @@ jobs:
         uses: dhananjaypai08/llm-alert@v1
         with:
           source: "openai"
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-## 📋 Inputs
+## Inputs
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
@@ -47,7 +44,7 @@ jobs:
 
 ## 🔧 Supported Providers
 
-- **OpenAI**: ✅ GPT-4 models (requires `OPENAI_API_KEY`)
+- **OpenAI**: GPT-4 models (requires `OPENAI_API_KEY`)
 - **Anthropic Claude**: 🚧 Coming soon
 - **Google Gemini**: 🚧 Coming soon
 - **Meta Llama**: 🚧 Coming soon
@@ -57,13 +54,15 @@ jobs:
 ### With Custom Notifications
 
 ```yaml
+### With Custom Notifications
+
+```yaml
 - name: Check for LLM updates
   id: llm-check
   uses: dhananjaypai/llm-version-alert@v1
   with:
     source: "openai"
-  env:
-    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    openai_api_key: ${{ secrets.OPENAI_API_KEY }}
 
 - name: Send Slack notification
   if: steps.llm-check.outputs.version_changed == 'true'
@@ -71,6 +70,19 @@ jobs:
     curl -X POST -H 'Content-type: application/json' \
       --data '{"text":"🚨 New model detected: ${{ steps.llm-check.outputs.model_detected }}"}' \
       ${{ secrets.SLACK_WEBHOOK_URL }}
+```
+
+### Multiple Providers
+
+```yaml
+- name: Check OpenAI
+  uses: dhananjaypai/llm-version-alert@v1
+  with:
+    source: "openai"
+    openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+
+# Add more providers as they become available
+```
 ```
 
 ### Multiple Providers
