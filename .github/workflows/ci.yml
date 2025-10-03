@@ -1,0 +1,11 @@
+on: [push, workflow_dispatch]
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - uses: ./action.yml
+        with:
+          source: "openai"

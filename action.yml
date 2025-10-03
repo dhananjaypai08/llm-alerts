@@ -1,0 +1,23 @@
+name: "LLM Version Checker"
+description: "Checks for new LLM releases and alerts automatically"
+inputs:
+  source:
+    description: "Source provider (e.g., openai)"
+    required: true
+    default: "openai"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      shell: bash
+      run: |
+        python3 --version
+        pip install requests
+        pip install python-dotenv
+
+    - name: Run version check
+      id: check
+      shell: bash
+      run: |
+        python3 $GITHUB_ACTION_PATH/check_llm.py "${{ inputs.source }}"
