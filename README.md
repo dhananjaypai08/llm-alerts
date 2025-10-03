@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check for new LLM models
-        uses: dhananjaypai08/llm-alert@v1
+        uses: dhananjaypai08/llm-alerts@v1
         with:
           source: "openai"
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}

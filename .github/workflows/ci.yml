@@ -7,7 +7,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: LLM Version Alert
-        uses: dhananjaypai08/llm-alerts@v1.0.0
+        uses: dhananjaypai08/llm-alerts@v1.1.0
         with:
           source: "openai"
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
