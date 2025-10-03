@@ -10,3 +10,4 @@ jobs:
         uses: ./
         with:
           source: "openai"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
