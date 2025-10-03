@@ -6,8 +6,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Run LLM Version Check
-        uses: ./
+      - name: LLM Version Alert
+        uses: dhananjaypai08/llm-alerts@v1.0.0
         with:
           source: "openai"
         env:
