@@ -32,8 +32,10 @@ jobs:
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `source` | LLM provider to check | Yes | `openai` |
-| `api_key` | API key for the provider | No | Uses `OPENAI_API_KEY` env var |
+| `source` | LLM provider to check (currently only `openai`) | Yes | `openai` |
+| `openai_api_key` | OpenAI API key (or set `OPENAI_API_KEY` env) | Yes | — |
+| `notify` | Notification mode: `none`, `issue`, or `fail` | No | `none` |
+| `manifest_file` | File to write latest model id into for PR visibility | No | `LATEST_LLM_MODEL.txt` |
 
 ## 📤 Outputs
 
@@ -51,51 +53,67 @@ jobs:
 
 ## 🛠️ Advanced Usage
 
-### With Custom Notifications
-
-```yaml
-### With Custom Notifications
+### Basic with Outputs
 
 ```yaml
 - name: Check for LLM updates
   id: llm-check
-  uses: dhananjaypai/llm-version-alert@v1
+  uses: dhananjaypai08/llm-alerts@v1
   with:
-    source: "openai"
+    source: openai
     openai_api_key: ${{ secrets.OPENAI_API_KEY }}
 
-- name: Send Slack notification
+- name: Use outputs
+  run: |
+    echo "Model: ${{ steps.llm-check.outputs.model_detected }}"
+    echo "Changed: ${{ steps.llm-check.outputs.version_changed }}"
+```
+
+### Notification Modes
+
+| Mode | Behavior |
+|------|----------|
+| `none` | Only sets outputs & summary notice |
+| `issue` | Creates or updates an issue titled `LLM Update: openai -> <model>` |
+| `fail` | Marks the job failed if a new model is found (use to gate merges) |
+
+Example using issue notifications and manifest file (commit in later step):
+
+```yaml
+- name: Check model & open issue
+  id: llm-check
+  uses: dhananjaypai08/llm-alerts@v1
+  with:
+    source: openai
+    openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+    notify: issue
+    manifest_file: LATEST_LLM_MODEL.txt
+
+- name: Commit manifest if changed
+  if: steps.llm-check.outputs.version_changed == 'true'
+  run: |
+    git config user.name 'llm-bot'
+    git config user.email 'llm-bot@users.noreply.github.com'
+    git add LATEST_LLM_MODEL.txt
+    git commit -m "chore: update LLM model to ${{ steps.llm-check.outputs.model_detected }}" || echo "No diff"
+```
+
+### Slack Notification Example
+
+```yaml
+- name: Check LLM
+  id: llm-check
+  uses: dhananjaypai08/llm-alerts@v1
+  with:
+    source: openai
+    openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+
+- name: Slack alert
   if: steps.llm-check.outputs.version_changed == 'true'
   run: |
     curl -X POST -H 'Content-type: application/json' \
-      --data '{"text":"🚨 New model detected: ${{ steps.llm-check.outputs.model_detected }}"}' \
+      --data '{"text":"🚨 New OpenAI model: ${{ steps.llm-check.outputs.model_detected }}"}' \
       ${{ secrets.SLACK_WEBHOOK_URL }}
-```
-
-### Multiple Providers
-
-```yaml
-- name: Check OpenAI
-  uses: dhananjaypai/llm-version-alert@v1
-  with:
-    source: "openai"
-    openai_api_key: ${{ secrets.OPENAI_API_KEY }}
-
-# Add more providers as they become available
-```
-```
-
-### Multiple Providers
-
-```yaml
-- name: Check OpenAI
-  uses: dhananjaypai/llm-version-alert@v1
-  with:
-    source: "openai"
-  env:
-    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-
-# Add more providers as they become available
 ```
 
 ## 🔐 Setup
@@ -108,11 +126,11 @@ jobs:
 
 ## 🏗️ How It Works
 
-1. Fetches the latest models from the provider's API
-2. Identifies the newest model based on creation timestamp
-3. Compares with previously detected version (stored in workspace)
-4. Sends GitHub Actions notice if a new model is found
-5. Updates the stored version for next run
+1. Fetches current OpenAI models list.
+2. Picks the newest GPT-4* variant by `created` timestamp.
+3. Compares with previously stored value in `.llm_latest`.
+4. Writes outputs, summary, optional manifest file.
+5. Optional: opens/updates issue or fails job depending on `notify`.
 
 ## 🤝 Contributing
 
@@ -130,3 +148,25 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## 🐛 Issues
 
 Found a bug or have a feature request? [Open an issue](https://github.com/dhananjaypai08/llm-alerts/issues)!
+
+## 🧪 Local CI Test with act
+
+A helper script is provided to repeatedly test the workflow locally whenever you modify the action logic.
+
+Prerequisites: Install `act` (macOS/Homebrew):
+
+```bash
+brew install act
+```
+
+Run the workflow job locally:
+
+```bash
+chmod +x scripts/test_ci_with_act.sh
+OPENAI_API_KEY=sk-yourkey scripts/test_ci_with_act.sh
+```
+
+Notes:
+- On Apple Silicon the script auto-adds `--container-architecture linux/amd64`.
+- Provide secrets either via environment (`OPENAI_API_KEY=`) or an optional `.secrets` file.
+- View job summary for notices about new model versions.

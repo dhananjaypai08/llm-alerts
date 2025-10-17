@@ -13,6 +13,14 @@ inputs:
   openai_api_key:
     description: "OpenAI API key for authentication"
     required: true
+  notify:
+    description: "Notification mode: none|issue|fail (issue creates/updates an issue; fail exits non-zero on change)"
+    required: false
+    default: "none"
+  manifest_file:
+    description: "File to write latest model id into (for PR/visibility). Empty to disable."
+    required: false
+    default: "LATEST_LLM_MODEL.txt"
 
 outputs:
   model_detected:
@@ -34,5 +42,8 @@ runs:
       shell: bash
       env:
         OPENAI_API_KEY: ${{ inputs.openai_api_key }}
+        NOTIFY_MODE: ${{ inputs.notify }}
+        MANIFEST_FILE: ${{ inputs.manifest_file }}
+        GITHUB_TOKEN: ${{ github.token }}
       run: |
         python3 ${{ github.action_path }}/check_llm.py "${{ inputs.source }}"
